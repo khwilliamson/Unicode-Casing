@@ -2,7 +2,9 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Depends;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-my $pkg = ExtUtils::Depends->new('Unicode::Casing', 'B::Hooks::OP::Check');
+my $pkg = ExtUtils::Depends->new('Unicode::Casing',
+                                 'B::Hooks::OP::Check',
+                                 'B::Hooks::OP::PPAddr');
 WriteMakefile(
     NAME              => 'Unicode::Casing',
     VERSION_FROM      => 'lib/Unicode/Casing.pm', # finds $VERSION
