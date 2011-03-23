@@ -14,7 +14,7 @@ our @EXPORT_OK = ();
 
 our @EXPORT = ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Unicode::Casing', $VERSION);
@@ -196,7 +196,7 @@ A potential problem with context-dependent case changing is that the routine
 may be passed insufficient context, especially with the in-line escapes like
 C<\L>.
 
-F<turkish.t>, which comes with the distribution includes a full implementation
+F<90turkish.t>, which comes with the distribution includes a full implementation
 of all the Turkish casing rules.
 
 =head1 AUTHOR

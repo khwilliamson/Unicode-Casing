@@ -1,7 +1,10 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Unicode-Casing.t'
 
-use Test::More tests => 37;
+use Test::More;
+
+plan skip_all => 'Needs 5.12 for various Unicode things' if $] < 5.012;
+plan tests => 37;
 
 # Verifies that can implement Turkish casing as defined by Unicode 5.2.
 
