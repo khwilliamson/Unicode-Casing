@@ -1,5 +1,6 @@
 package Unicode::Casing;    # pod is after __END__ in this file
 
+require 5.010;  # Because of Perl bugs; can work on earlier Perls with care
 use strict;
 use warnings;
 use Carp;
@@ -14,7 +15,7 @@ our @EXPORT_OK = ();
 
 our @EXPORT = ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Unicode::Casing', $VERSION);
@@ -172,7 +173,8 @@ C<use re 'eval'> is not needed to have the inline case-changing sequences
 work in regular expressions.
 
 Here's an example of a real-life application, for Turkish, that shows
-context-sensitive case-changing.
+context-sensitive case-changing.  (Because of bugs in earlier Perls, version
+5.12 is required for this example to work properly.)
 
  sub turkish_lc($) {
     my $string = shift;
@@ -198,6 +200,12 @@ C<\L>.
 
 F<90turkish.t>, which comes with the distribution includes a full implementation
 of all the Turkish casing rules.
+
+Note that there are problems with the standard case changing operation for
+characters whose code points are between 128 and 255.  To get the correct
+Unicode behavior, the strings must be encoded in utf8 (which the override
+functions can force) or calls to the operations must be within the scope of C<use
+feature 'unicode_strings'> (which is available starting in Perl version 5.12).
 
 =head1 AUTHOR
 

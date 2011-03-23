@@ -18,4 +18,7 @@ WriteMakefile(
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
     $pkg->get_makefile_vars,
+    CONFIGURE_REQUIRES => { "B::Hooks::OP::Check" => 0,
+                            "B::Hooks::OP::PPAddr" => 0,
+                          }
 );
