@@ -1,6 +1,8 @@
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+my $pkg = ExtUtils::Depends->new('Unicode::Casing', 'B::Hooks::OP::Check');
 WriteMakefile(
     NAME              => 'Unicode::Casing',
     VERSION_FROM      => 'lib/Unicode/Casing.pm', # finds $VERSION
@@ -13,4 +15,5 @@ WriteMakefile(
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
+    $pkg->get_makefile_vars,
 );
