@@ -15,7 +15,7 @@ our @EXPORT_OK = ();
 
 our @EXPORT = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Unicode::Casing', $VERSION);
@@ -95,7 +95,8 @@ sub import {
             croak("$user_sub is not a CODE reference");
         }
         if ($function ne 'uc' && $function ne 'lc'
-            && $function ne 'ucfirst' && $function ne 'lcfirst')
+            && $function ne 'ucfirst' && $function ne 'lcfirst'
+            && ! ($function eq 'fc' && $^V ge v5.15.8))
         {
             croak("$function must be one of: 'uc', 'lc', 'ucfirst', 'lcfirst'");
         }
@@ -127,8 +128,29 @@ sub unimport {
     return;
 }
 
+sub fc ($) {
+    use Unicode::UCD qw(casefold);
+    my $return = "";
+
+    foreach my $char (split //, $_[0]) { 
+        if (defined (my $fold = casefold(ord $char)->{'full'}) {
+
+            # $fold is a string of space-separated hex ordinals
+            $return .= join "", map { chr hex } split / /, $fold;
+        }
+        else {
+            $return .= $char;
+        }
+    }
+    return $return;
+}
+        
+        
+
 1;
 __END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -246,9 +268,10 @@ See L<http://perlmonks.org/?node_id=797851>.
 
 =head1 AUTHOR
 
-Karl Williamson, E<lt>khw@cpan.orgE<gt>,
+Karl Williamson, C<< <khw@cpan.org> >>,
 with advice and guidance from various Perl 5 porters,
 including Paul Evans, Burak Gürsoy, Florian Ragwitz, and Ricardo Signes.
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2011 by Karl Williamson
@@ -259,3 +282,245 @@ at your option, any later version of Perl 5 you may have available.
 
 
 =cut
+If there were a CPAN module that let people use fc() for now until 5.16,
+I'd be a lot more comfy with recommending it.  That way if something else
+happens and it doesn't make it, they will still have something they can use.
+
+Do you think that would be possible?
+
+I do have my own versions that I use in unichars because I need *all*
+possible Unicode casings available, but it's um, pretty stupidheaded.
+
+    lc    lc_simple     lc_full
+    uc    uc_simple     uc_full
+    tc    tc_simple     tc_full
+    fc    fc_simple     fc_full    fc_turkic
+
+Plus various for dealing with the titlecasing/lowercasing
+each word in a string.  
+
+Note that none of those I just listed is the same as ucfirst().  
+In my API below, that corresponds to tc_full_first().  tc()
+does it to the whole string, just as uc() and lc() do.
+
+Here it is without the module fluff.  The way I cache stuff
+is just dumb, but it was easy to code up this way.  I don't
+remember whether I sent this to you before.
+
+--tom
+
+
+use Unicode::UCD qw(casefold charinfo);
+
+################################################################
+
+# XXX: these should be LRU-caches, but are just OR-caches
+our $FCI;
+our $FCF;
+
+UNITCHECK { 
+    $FCI = {};
+    $FCF = {};
+}
+
+################################################################
+
+# forward declarations for functions so they work like the
+# corresponding builtins (uc, lc, ucfirst)
+
+sub all_casefold(_);
+sub simple_casemap_all(_);
+
+sub fc(_);
+sub fc_simple(_);
+sub fc_full(_);
+sub fc_turkic(_);
+
+# lc is builtin, which is full
+sub lc_simple(_);
+sub lc_full(_);
+
+# uc is builtin, which is full
+sub uc_simple(_);
+sub uc_full(_);
+
+# ucfirst is builtin, which is full, but it
+# is the first char only, so you have to
+# decide between first, all, or tc the start
+# or a word and lc the rest fo it
+
+sub tc_simple(_);
+sub tc_full(_);
+
+sub tc_simple_char(_);
+sub tc_simple_first(_);
+sub tc_simple_all(_);
+sub tc_simple_words(_);
+
+sub tc_full_char(_);
+sub tc_full_first(_);
+sub tc_full_all(_);
+sub tc_full_words(_);
+
+sub _tc_template_builder;
+
+#########################################
+
+# for completeness' sake
+sub lc_full(_) { lc      shift }
+sub uc_full(_) { uc      shift }
+sub tc_full(_) { ucfirst shift }
+sub tc(_)      { &tc_full }
+
+sub tc_full_first(_) { &tc_full } 
+
+sub lc_simple(_) {
+    my $arg = shift;
+    return (simple_casemap_all($arg))[0];
+}
+
+sub uc_simple(_) {
+    my $arg = shift;
+    return (simple_casemap_all($arg))[2];
+}
+
+sub tc_simple_char(_) {
+    my $arg = shift;
+
+    # croak "expected argument of length 1 code point" unless defined($arg) && (length($arg) == 1);
+
+    return (simple_casemap_all($arg))[1];
+}
+
+sub tc_simple_all(_) {
+    my $arg = shift;
+    return join q() => map { tc_simple_char } (split //, $arg);
+}
+
+sub tc_full_all(_) {
+    my $arg = shift;
+    return join q() => map { tc_full_char } (split //, $arg);
+}
+
+sub tc_simple(_) { &tc_simple_first }
+sub tc_simple_first(_) {
+    my $arg = shift;
+    substr($arg, 0, 1) = tc_simple_char(substr($arg, 0, 1));
+    return $arg;
+}
+
+sub _tc_template_builder {
+
+    my $WORD_RX = qr{
+        \b 
+        (?<first_grapheme> (?=\w) \X  )  
+        (?<word_remainder>        \w* )
+        \b
+    }x;
+
+    for my $style ("simple", "full") {
+        no strict "refs";
+
+        my $tc_char_func = \&{"tc_${style}_char"};
+        my $lc_func      = \&{"lc_${style}"};
+
+        *{"tc_${style}_words"} = sub(_) { 
+            use strict "refs";
+            my $arg = shift;
+            $arg =~ s{
+                $WORD_RX
+            }{
+                $tc_char_func->($1) . 
+                    ( length($2) 
+                        ? $lc_func->($2) 
+                        : ""
+                    )
+            }xeg;
+            return $arg;
+        };
+
+    } 
+} 
+
+sub all_casefold(_) {
+    my $sf_string = "";
+    my $tf_string = "";
+    my $ff_string = "";
+
+    my $orig = shift;
+
+    for my $cp (map { ord } split //, $orig) { 
+        my $casefold = $$FCF{$cp} ||= casefold($cp);
+        if (defined $casefold) {
+            my @full_fold_hex = split / /, $casefold->{"full"};
+            my $full_fold_string =
+                       join "", map {chr(hex($_))} @full_fold_hex;
+            $ff_string .= $full_fold_string;
+            my @turkic_fold_hex =
+                           split / /, ($casefold->{"turkic"} ne "")
+                                           ? $casefold->{"turkic"}
+                                           : $casefold->{"full"};
+            my $turkic_fold_string =
+                           join "", map {chr(hex($_))} @turkic_fold_hex;
+            $tf_string .= $turkic_fold_string;
+        } else {
+            $ff_string .= chr($cp);
+            $tf_string .= chr($cp);
+        } 
+        if (defined $casefold && $casefold->{"simple"} ne "") {
+            my $simple_fold_hex = $casefold->{"simple"};
+            my $simple_fold_string = chr(hex($simple_fold_hex));
+            $sf_string .= $simple_fold_string;
+        } else {
+            $sf_string .= chr($cp);
+        } 
+    }
+
+    return ($sf_string, $tf_string, $ff_string);
+}
+
+sub fc(_)        { &fc_full }
+sub fc_simple(_) { return (all_casefold(shift))[0] } 
+sub fc_turkic(_) { return (all_casefold(shift))[1] } 
+sub fc_full(_)   { return (all_casefold(shift))[2] } 
+
+sub simple_casemap_all(_) {
+    my $lc_string = "";
+    my $tc_string = "";
+    my $uc_string = "";
+
+    my $orig = shift;
+
+    for my $cp (map { ord } split //, $orig) { 
+        my $charinfo = $$FCI{$cp} ||= charinfo($cp);
+
+        if ($charinfo->{"lower"}) {
+            $lc_string .= chr(hex($charinfo->{"lower"}));
+        } else {
+            $lc_string .= chr($cp);
+        } 
+
+        if ($charinfo->{"title"}) {
+            $tc_string .= chr(hex($charinfo->{"title"}));
+        } else {
+            $tc_string .= chr($cp);
+        } 
+
+        if ($charinfo->{"upper"}) {
+            $uc_string .= chr(hex($charinfo->{"upper"}));
+        } else {
+            $uc_string .= chr($cp);
+        } 
+
+    }
+    return ($lc_string, $tc_string, $uc_string);
+}
+
+UNITCHECK  {
+    _tc_template_builder();
+} 
+
+1;
+
+
+

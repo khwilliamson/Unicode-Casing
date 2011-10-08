@@ -1,10 +1,10 @@
 Casing.xs
 Changes
+lib/Unicode/Casing.pm
 Makefile.PL
 MANIFEST
 ppport.h
 README
 t/01basic.t
 t/90turkish.t
-lib/Unicode/Casing.pm
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,8 +1,13 @@
 Revision history for Perl extension Unicode::Casing.
 
+0.08  Sun Aug  7 04:45:58 CDT 2011 (brian d foy)
+        - Fix RT #69400: Pod as UTF-8, Copyright header
+        - Fix RT #69399: Prereqs in Makefile.PL
+
+0.07  Tue Apr 12 2011
+        - Added -load option, and doc changes
+
 0.01  Sun Mar 13 21:17:28 2011
 	- original version; created by h2xs 1.23 with options
 		-I../blead/lib -A -n Unicode::Casing
 
-0.07  Tue Apr 12 2011
-        - Added -load option, and doc changes
