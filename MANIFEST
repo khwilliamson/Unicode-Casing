@@ -8,3 +8,4 @@ README
 t/01basic.t
 t/90turkish.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,6 +6,12 @@
 #include "hook_op_check.h"
 #include "hook_op_ppaddr.h"
 
+#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
+#define PERL_DECIMAL_VERSION \
+    PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
+#define PERL_VERSION_GE(r,v,s) \
+    (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
 STATIC SV * dispatch = NULL;
 
 STATIC OP *
@@ -76,7 +82,17 @@ opcode_from_name(pTHX_ const char* const name) {
         } else {
             return OP_UC;
         }
-    } else if (strlen(name) > 2) {
+    }
+
+#if PERL_VERSION_GE(5,15,8)
+
+    else if (*name == 'f') {
+        return OP_FC;
+    }
+
+#endif
+
+    else if (strlen(name) > 2) {
         return OP_LCFIRST;
     }
 
@@ -95,7 +111,7 @@ setup(type)
     CODE:
 
     /* setup() is called to set up function 'type': one of 'uc', 'ucfirst',
-     * 'lc', or 'lcfirst' to be overridden by a user-defined equivalent. */
+     * 'lc', 'lcfirst', or 'fc to be overridden by a user-defined equivalent. */
 
     /* Set check_call_back() to be called whenever 'op' is
         * encountered in the parse */

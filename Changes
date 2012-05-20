@@ -1,5 +1,13 @@
 Revision history for Perl extension Unicode::Casing.
 
+0.10  Fri May 18 2012
+       - Fix bugs introduced by 0.09 on older Perls
+       - Fix #70270.
+       - Clean up pod to correct misstatements about CORE::
+       
+0.09  Mon May 07 2012
+        - Add support for fc(), \F
+
 0.08  Sun Aug  7 04:45:58 CDT 2011 (brian d foy)
         - Fix RT #69400: Pod as UTF-8, Copyright header
         - Fix RT #69399: Prereqs in Makefile.PL
