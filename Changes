@@ -1,5 +1,9 @@
 Revision history for Perl extension Unicode::Casing.
 
+0.11  Thu May 24 2012
+       - Try changes to Makefile.PL to find B::Hooks::OP::PPAddr, which isn't
+         being found on some platforms
+
 0.10  Fri May 18 2012
        - Fix bugs introduced by 0.09 on older Perls
        - Fix #70270.

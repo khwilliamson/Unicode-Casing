@@ -12,13 +12,13 @@ WriteMakefile(
     NAME              => 'Unicode::Casing',
     VERSION_FROM      => 'lib/Unicode/Casing.pm', # finds $VERSION
     PREREQ_PM         => {
-     						'B::Hooks::OP::Check'  => 0,
-							'B::Hooks::OP::PPAddr' => 0,
-							'Test::More'           => 0,
-							'XSLoader'             => 0,
+                            'B::Hooks::OP::Check'  => 0,
+                            'B::Hooks::OP::PPAddr' => 0,
+                            'Test::More'           => 0,
+                            'XSLoader'             => 0,
 						},
-	ABSTRACT_FROM     => 'lib/Unicode/Casing.pm', # retrieve abstract from module
-	AUTHOR            => 'Karl Williamson <khw@(none)>',
+    ABSTRACT_FROM     => 'lib/Unicode/Casing.pm', # retrieve abstract from module
+    AUTHOR            => 'Karl Williamson <khw@cpan.org>',
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
@@ -28,6 +28,10 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
                             'ExtUtils::MakeMaker'  => 0,
                             'ExtUtils::Depends'    => 0,
+
+                            # Suggested by Florian Ragwitz to see if this
+                            # clears up some load issues on some platforms
+                            'B::Hooks::OP::PPAddr' => 0,
                           },
     clean => {
     	FILES => [ qw(Unicode-*) ],
