@@ -32,6 +32,7 @@ WriteMakefile(
                             # Suggested by Florian Ragwitz to see if this
                             # clears up some load issues on some platforms
                             'B::Hooks::OP::PPAddr' => 0,
+                            'B::Hooks::OP::Check'  => 0,
                           },
     clean => {
     	FILES => [ qw(Unicode-*) ],

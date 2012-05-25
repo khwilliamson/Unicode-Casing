@@ -15,7 +15,7 @@ our @EXPORT_OK = ();
 
 our @EXPORT = ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Unicode::Casing', $VERSION);
