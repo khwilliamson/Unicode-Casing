@@ -4,3 +4,5 @@ Revision history for Perl extension Unicode::Casing.
 	- original version; created by h2xs 1.23 with options
 		-I../blead/lib -A -n Unicode::Casing
 
+0.07  Tue Apr 12 2011
+        - Added -load option, and doc changes

@@ -15,7 +15,7 @@ our @EXPORT_OK = ();
 
 our @EXPORT = ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Unicode::Casing', $VERSION);
@@ -86,6 +86,7 @@ sub import {
     my %args;
 
     while (my $function = shift) {
+        return if $function eq '-load';
         my $user_sub;
         if (! defined ($user_sub = shift)) {
             croak("Missing CODE reference for $function");
@@ -139,6 +140,20 @@ Unicode::Casing - Perl extension to override system case changing functions
             uc => \&my_uc, lc => \&my_lc,
             ucfirst => \&my_ucfirst, lcfirst => \&my_lcfirst;
   no Unicode::Casing;
+
+  package foo::bar;
+    use Unicode::Casing -load;
+    sub import {
+        Unicode::Casing->import(
+            uc      => \&_uc,
+            lc      => \&_lc,
+            ucfirst => \&_ucfirst,
+            lcfirst => \&_lcfirst,
+        );
+    }
+    sub unimport {
+        Unicode::Casing->unimport;
+    }
 
 =head1 DESCRIPTION
 
@@ -207,10 +222,33 @@ Unicode behavior, the strings must be encoded in utf8 (which the override
 functions can force) or calls to the operations must be within the scope of C<use
 feature 'unicode_strings'> (which is available starting in Perl version 5.12).
 
+Note that there can be problems installing this (at least on Windows)
+if using an old version of ExtUtils::Depends. To get around this follow
+these steps:
+
+=over
+
+=item 1
+
+upgrade ExtUtils::Depends
+
+=item 2
+
+force install B::Hooks::OP::Check
+
+=item 3
+
+force install B::Hooks::OP::PPAddr
+
+=back
+
+See L<http://perlmonks.org/?node_id=797851>.
+
 =head1 AUTHOR
 
-Karl Williamson, E<lt>khw@cpan.orgE<gt>
-
+Karl Williamson, E<lt>khw@cpan.orgE<gt>,
+with advice and guidance from various Perl 5 porters,
+including Paul Evans, Burak Gürsoy, Florian Ragwitz, and Ricardo Signes.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2011 by Karl Williamson
