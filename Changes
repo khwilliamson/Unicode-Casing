@@ -1,5 +1,8 @@
 Revision history for Perl extension Unicode::Casing.
 
+0.13  Mon Aug 18 2014
+       - Fix assertion failure in debugging builds (Brian Fraser)
+
 0.12  Fri May 25 2012
        - Try changes to Makefile.PL to find B::Hooks::OP::Check, which isn't
          being found on some platforms
