@@ -51,6 +51,12 @@ execute_call_back (pTHX_ OP *op, void *user_data) {
     FREETMPS;
     LEAVE;
 
+    /* S_fold_constant expects us to return either a
+     * temp (from the pad or otherwise) or an immortal,
+     * and fails an assertion if we don't. So mark this
+     * as a temp.
+     */
+    SvTEMP_on(result);
     XPUSHs(result);
 
     RETURN;
