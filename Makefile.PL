@@ -11,6 +11,8 @@ my $pkg = ExtUtils::Depends->new('Unicode::Casing',
 WriteMakefile(
     NAME              => 'Unicode::Casing',
     VERSION_FROM      => 'lib/Unicode/Casing.pm', # finds $VERSION
+    MIN_PERL_VERSION  => '5.10.0',
+    LICENSE           => 'perl_5',  
     PREREQ_PM         => {
                             'B::Hooks::OP::Check'  => 0,
                             'B::Hooks::OP::PPAddr' => 0,
@@ -19,6 +21,16 @@ WriteMakefile(
 						},
     ABSTRACT_FROM     => 'lib/Unicode/Casing.pm', # retrieve abstract from module
     AUTHOR            => 'Karl Williamson <khw@cpan.org>',
+    META_MERGE        => {
+                           "meta-spec" => { version => 2 },
+                           resources => {
+                               repository => {
+                                   type => 'git',
+                                   url => 'git@github.com:khwilliamson/Unicode-Casing.git',
+                                   web => 'https://github.com/khwilliamson/Unicode-Casing',
+                               },
+                           },
+                       },
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
