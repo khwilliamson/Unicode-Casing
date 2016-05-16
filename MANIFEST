@@ -1,8 +1,12 @@
 Casing.xs
 Changes
 lib/Unicode/Casing.pm
+LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
 ppport.h
 README
 t/01basic.t
