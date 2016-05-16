@@ -10,10 +10,14 @@ Build.bat
 /Makefile
 /Makefile.old
 /MANIFEST.bak
+/MANIFEST.SKIP.bak
 /META.yml
 /META.json
 /MYMETA.*
 nytprof.out
 /pm_to_blib
+*.c
 *.o
 *.bs
+Unicode-Casing-*/
+Unicode-Casing-*.tar.gz

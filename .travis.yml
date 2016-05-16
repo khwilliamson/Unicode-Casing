@@ -1,0 +1,19 @@
+sudo: false
+language: perl
+perl:
+# - '5.24'  TODO - not yet available
+- '5.22'
+- '5.20'
+- '5.18'
+- '5.16'
+- '5.14'
+- '5.12'
+- '5.10'
+install:
+- cpanm -n -q
+  Test::More
+  ExtUtils::Depends
+  B::Hooks::OP::PPAddr
+  B::Hooks::OP::Check
+script:
+  "perl Makefile.PL && make test"
