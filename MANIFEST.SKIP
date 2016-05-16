@@ -3,5 +3,6 @@
 .*\.bs
 .*\.c
 .*\.o
+\.travis.yml
 Unicode-Casing-.*/
 Unicode-Casing-.*.tar.gz
