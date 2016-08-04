@@ -1,5 +1,9 @@
 Revision history for Perl extension Unicode::Casing.
 
+0.16  Thu Aug 04 2016
+       - Add LICENSE to MANIFEST
+       - Fix some build issues, thanks to Karen Etheridge
+
 0.13  Mon Aug 18 2014
        - Fix assertion failure in debugging builds (Brian Fraser)
 

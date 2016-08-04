@@ -3,6 +3,7 @@ Changes
 lib/Unicode/Casing.pm
 LICENSE
 Makefile.PL
+LICENSE
 MANIFEST
 MANIFEST.SKIP
 META.json
